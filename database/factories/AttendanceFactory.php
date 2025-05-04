@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Barcode;
-use App\Models\Shift;
+use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -43,19 +43,19 @@ class AttendanceFactory extends Factory
         return $this->state(function (array $attributes) use ($late) {
             /** @var Barcode */
             $barcode = Barcode::inRandomOrder()->first();
-            /** @var Shift */
-            $shift = Shift::inRandomOrder()->first();
-            $time_in = Carbon::parse($shift->start_time)->subMinutes(rand(0, max: 15))->toTimeString();
-            $time_out = Carbon::parse($shift->end_time)->addMinutes(rand(0, max: 15))->toTimeString();
+            /** @var E */
+            $event = Event::inRandomOrder()->first();
+            $time_in = Carbon::parse($event->start_time)->subMinutes(rand(0, max: 15))->toTimeString();
+            $time_out = Carbon::parse($event->end_time)->addMinutes(rand(0, max: 15))->toTimeString();
             if ($late) {
-                $time_in = Carbon::parse($shift->start_time)->addMinutes(rand(min: 1, max: 15))->toTimeString();
+                $time_in = Carbon::parse($event->start_time)->addMinutes(rand(min: 1, max: 15))->toTimeString();
             }
             return [
                 'barcode_id' => $barcode->id,
                 'time_in' => $time_in,
                 'time_out' => $time_out,
                 'status' => $late ? 'late' : 'present',
-                'shift_id' => $shift->id,
+                'event_id' => $event->id,
                 'latitude' => $barcode->latitude,
                 'longitude' => $barcode->longitude,
                 'note' => null,

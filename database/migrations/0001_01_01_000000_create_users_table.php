@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,17 +12,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->string('nip')->nullable();
+            $table->string('nim')->nullable(); // Diubah dari nip menjadi nim
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone');
             $table->enum('gender', ['male', 'female']);
-            $table->date('birth_date')->nullable(); // tanggal lahir
-            $table->string('birth_place')->nullable(); // tempat lahir
-            $table->string('address'); // alamat tempat tinggal
-            $table->string('city'); // kota
+            // hapus birth_date
+            // hapus birth_place
+            // hapus address
+            // hapus city
 
-            // pendidikan terakhir
+            // pendidikan terakhir diubah menjadi kelas
             $table->foreignId('education_id')->nullable()->constrained('educations');
             // divisi
             $table->foreignId('division_id')->nullable()->constrained('divisions');

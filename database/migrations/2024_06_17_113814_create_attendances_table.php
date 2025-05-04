@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('date')->nullable();
             $table->time('time_in')->nullable(); // absensi masuk
             $table->time('time_out')->nullable(); // absensi keluar
-            $table->foreignId('shift_id')->nullable()->constrained('shifts');
+            $table->foreignId('event_id')->nullable()->constrained('events');
             $table->double('latitude')->nullable(); // lokasi absensi sumbu Y
             $table->double('longitude')->nullable(); // lokasi absensi sumbu X
             $table->enum('status', [

@@ -31,16 +31,16 @@ class UserFactory extends Factory
     {
         $gender = fake()->randomElement(['male', 'female']);
         return [
-            'nip' => fake()->numerify('#################'),
+            'nim' => fake()->numerify('#################'),
             'name' => fake()->name($gender),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'phone' => fake()->phoneNumber(),
             'gender' => $gender,
-            'birth_date' => fake()->date(),
-            'birth_place' => fake()->city(),
-            'address' => fake()->address(),
-            'city' => fake()->city(),
+            // 'birth_date' => fake()->date(),
+            // 'birth_place' => fake()->city(),
+            // 'address' => fake()->address(),
+            // 'city' => fake()->city(),
             'password' => static::$password ??= Hash::make('password'),
             'raw_password' => 'password',
             'two_factor_secret' => null,
@@ -58,7 +58,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -68,13 +68,13 @@ class UserFactory extends Factory
      */
     public function admin(bool $superadmin = false): static
     {
-        return $this->state(fn (array $attributes) => [
-            'nip' => '0000000000000000',
+        return $this->state(fn(array $attributes) => [
+            'nim' => '0000000000000000',
             'phone' => '00000000000',
-            'birth_date' => null,
-            'birth_place' => null,
-            'address' => '',
-            'city' => '',
+            // 'birth_date' => null,
+            // 'birth_place' => null,
+            // 'address' => '',
+            // 'city' => '',
             'group' => $superadmin ? 'superadmin' : 'admin',
             'gender' => 'male',
         ]);
@@ -92,7 +92,7 @@ class UserFactory extends Factory
 
         return $this->has(
             Team::factory()
-                ->state(fn (array $attributes, User $user) => [
+                ->state(fn(array $attributes, User $user) => [
                     'name' => $user->name . '\'s Team',
                     'user_id' => $user->id,
                     'personal_team' => true,
