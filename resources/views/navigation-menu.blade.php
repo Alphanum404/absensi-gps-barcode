@@ -44,10 +44,10 @@
                   {{ __('Job Title') }}
                 </x-dropdown-link>
                 <x-dropdown-link href="{{ route('admin.masters.education') }}" :active="request()->routeIs('admin.masters.education')">
-                  {{ __('Education') }}
+                  {{ __('Major') }}
                 </x-dropdown-link>
-                <x-dropdown-link href="{{ route('admin.masters.shift') }}" :active="request()->routeIs('admin.masters.shift')">
-                  {{ __('Shift') }}
+                <x-dropdown-link href="{{ route('admin.masters.event') }}" :active="request()->routeIs('admin.masters.event')">
+                  {{ __('Event') }}
                 </x-dropdown-link>
                 <hr>
                 <x-dropdown-link href="{{ route('admin.masters.admin') }}" :active="request()->routeIs('admin.masters.admin')">
@@ -178,16 +178,16 @@
           {{ __('Job Title') }}
         </x-responsive-nav-link>
         <x-responsive-nav-link href="{{ route('admin.masters.education') }}" :active="request()->routeIs('admin.masters.education')">
-          {{ __('Education') }}
+          {{ __('Major') }}
         </x-responsive-nav-link>
-        <x-responsive-nav-link href="{{ route('admin.masters.shift') }}" :active="request()->routeIs('admin.masters.shift')">
-          {{ __('Shift') }}
+        <x-responsive-nav-link href="{{ route('admin.masters.event') }}" :active="request()->routeIs('admin.masters.event')">
+          {{ __('Event') }}
         </x-responsive-nav-link>
         <x-responsive-nav-link href="{{ route('admin.masters.admin') }}" :active="request()->routeIs('admin.masters.admin')">
           {{ __('Admin Management') }}
         </x-responsive-nav-link>
         <x-responsive-nav-link href="{{ route('admin.import-export.users') }}" :active="request()->routeIs('admin.import-export')">
-          Import & Export Karyawan/Admin
+          Import & Export Anggota/Admin
         </x-responsive-nav-link>
         <x-responsive-nav-link href="{{ route('admin.import-export.attendances') }}" :active="request()->routeIs('admin.import-export')">
           Import & Export Absensi
