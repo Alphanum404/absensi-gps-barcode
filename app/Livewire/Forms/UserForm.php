@@ -13,46 +13,26 @@ class UserForm extends Form
     public ?User $user = null;
 
     public $name = '';
-    public $nip = '';
+    public $nim = ''; // Diubah dari nip
     public $email = '';
     public $phone = '';
-    public $password = null;
-    public $gender = null;
-    public $city = '';
-    public $address = '';
+    public $password = '';
+    public $gender = '';
     public $group = 'user';
-    public $birth_date = null;
-    public $birth_place = '';
     public $division_id = null;
     public $education_id = null;
     public $job_title_id = null;
     public $photo = null;
 
-    public function rules()
+    protected function rules()
     {
-        $requiredOrNullable = $this->group === 'user' ? 'required' : 'nullable';
         return [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('users')->ignore($this->user)
-            ],
-            'nip' => [$requiredOrNullable, 'string', 'max:255'],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($this->user)
-            ],
-            'phone' => ['required',  'string', 'min:5', 'max:255'],
-            'password' => ['nullable', 'string', 'min:4', 'max:255'],
-            'gender' => [$requiredOrNullable, 'in:male,female'],
-            'city' => [$requiredOrNullable, 'string', 'max:255'],
-            'address' => [$requiredOrNullable, 'string', 'max:255'],
-            'group' => ['nullable', 'string', 'max:255', Rule::in(User::$groups)],
-            'birth_date' => ['nullable', 'date'],
-            'birth_place' => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'nim' => ['required', 'string', 'max:255', Rule::unique('users', 'nim')->ignore($this->user?->id)], // Diubah dari nip
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->user?->id)],
+            'phone' => ['required', 'string', 'max:255'],
+            'password' => $this->user ? ['nullable', 'string'] : ['required', 'string'],
+            'gender' => ['required', 'string', 'in:male,female'],
             'division_id' => ['nullable', 'exists:divisions,id'],
             'education_id' => ['nullable', 'exists:educations,id'],
             'job_title_id' => ['nullable', 'exists:job_titles,id'],
@@ -64,20 +44,14 @@ class UserForm extends Form
     {
         $this->user = $user;
         $this->name = $user->name;
-        $this->nip = $user->nip;
+        $this->nim = $user->nim; // Diubah dari nip
         $this->email = $user->email;
         $this->phone = $user->phone;
         if ($this->isAllowed()) {
             $this->password = $user->raw_password;
         }
         $this->gender = $user->gender;
-        $this->city = $user->city;
-        $this->address = $user->address;
         $this->group = $user->group;
-        $this->birth_date = $user->birth_date
-            ? \Illuminate\Support\Carbon::parse($user->birth_date)->format('Y-m-d')
-            : null;
-        $this->birth_place = $user->birth_place;
         $this->division_id = $user->division_id;
         $this->education_id = $user->education_id;
         $this->job_title_id = $user->job_title_id;
@@ -96,7 +70,8 @@ class UserForm extends Form
             'password' => Hash::make($this->password ?? 'password'),
             'raw_password' => $this->password ?? 'password',
         ]);
-        if (isset($this->photo)) $user->updateProfilePhoto($this->photo);
+        if (isset($this->photo))
+            $user->updateProfilePhoto($this->photo);
         $this->reset();
     }
 
@@ -111,7 +86,8 @@ class UserForm extends Form
             'password' => $this->password ? Hash::make($this->password) : $this->user?->password,
             'raw_password' => $this->password ?? $this->user?->raw_password,
         ]);
-        if (isset($this->photo)) $this->user->updateProfilePhoto($this->photo);
+        if (isset($this->photo))
+            $this->user->updateProfilePhoto($this->photo);
         $this->reset();
     }
 

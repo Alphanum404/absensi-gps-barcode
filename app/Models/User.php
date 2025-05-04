@@ -27,22 +27,17 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'nip',
         'name',
         'email',
         'password',
-        'raw_password',
-        'group',
+        'nim', // Diubah dari nip
         'phone',
         'gender',
-        'birth_date',
-        'birth_place',
-        'address',
-        'city',
         'education_id',
         'division_id',
         'job_title_id',
-        'profile_photo_path',
+        'group',
+        'raw_password',
     ];
 
     /**
@@ -76,7 +71,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'birth_date' => 'datetime:Y-m-d',
+            // 'birth_date' => 'datetime:Y-m-d',
             'password' => 'hashed',
         ];
     }
