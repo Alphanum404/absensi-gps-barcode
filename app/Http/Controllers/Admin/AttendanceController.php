@@ -74,8 +74,8 @@ class AttendanceController extends Controller
                                     if ($v->attachment) {
                                         $v->setAttribute('attachment', $v->attachment_url);
                                     }
-                                    if ($v->shift) {
-                                        $v->setAttribute('shift', $v->shift->name);
+                                    if ($v->event) {
+                                        $v->setAttribute('event', $v->event->name);
                                     }
                                     return $v->getAttributes();
                                 }

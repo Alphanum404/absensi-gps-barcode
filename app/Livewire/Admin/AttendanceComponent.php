@@ -69,10 +69,10 @@ class AttendanceComponent extends Component
         $employees = User::where('group', 'user')
             ->when($this->search, function (Builder $q) {
                 return $q->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('nip', 'like', '%' . $this->search . '%');
+                    ->orWhere('nim', 'like', '%' . $this->search . '%');
             })
-            ->when($this->division, fn (Builder $q) => $q->where('division_id', $this->division))
-            ->when($this->jobTitle, fn (Builder $q) => $q->where('job_title_id', $this->jobTitle))
+            ->when($this->division, fn(Builder $q) => $q->where('division_id', $this->division))
+            ->when($this->jobTitle, fn(Builder $q) => $q->where('job_title_id', $this->jobTitle))
             ->paginate(20)->through(function (User $user) {
                 if ($this->date) {
                     $attendances = new Collection(Cache::remember(
@@ -93,8 +93,8 @@ class AttendanceComponent extends Component
                                     if ($v->attachment) {
                                         $v->setAttribute('attachment', $v->attachment_url);
                                     }
-                                    if ($v->shift) {
-                                        $v->setAttribute('shift', $v->shift->name);
+                                    if ($v->event) {
+                                        $v->setAttribute('event', $v->event->name);
                                     }
                                     return $v->getAttributes();
                                 }

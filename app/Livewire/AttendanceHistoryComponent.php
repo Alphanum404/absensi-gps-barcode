@@ -17,13 +17,44 @@ class AttendanceHistoryComponent extends Component
 
     public function mount()
     {
-        $this->month = date('Y-m');
+        $this->month = now()->format('Y-m');
+
+        // Force cache refresh for the current month
+        $this->clearAttendanceCache();
+    }
+
+    protected function clearAttendanceCache()
+    {
+        $user = auth()->user();
+        $date = Carbon::parse($this->month);
+
+        // Clear user-specific attendance cache for the current month
+        $cacheKey = "attendance-$user->id-$date->month-$date->year";
+        Cache::forget($cacheKey);
+    }
+
+    // Also add this method to force refresh
+    public function refreshData()
+    {
+        $this->clearAttendanceCache();
     }
 
     public function render()
     {
         $user = auth()->user();
         $date = Carbon::parse($this->month);
+
+        // Get all events for the current month
+        $events = \App\Models\Event::whereMonth('event_date', $date->month)
+            ->whereYear('event_date', $date->year)
+            ->orWhere('is_recurring', true)
+            ->get()
+            ->pluck('event_date')
+            ->map(function ($eventDate) {
+                return $eventDate ? $eventDate->format('Y-m-d') : null;
+            })
+            ->filter()
+            ->toArray();
 
         $start = Carbon::parse($this->month)->startOfMonth();
         $end = Carbon::parse($this->month)->endOfMonth();
@@ -37,7 +68,7 @@ class AttendanceHistoryComponent extends Component
                 $attendances = Attendance::filter(
                     month: $this->month,
                     userId: $user->id,
-                )->get(['id', 'status', 'date', 'latitude', 'longitude', 'attachment', 'note']);
+                )->get(['id', 'status', 'date', 'latitude', 'longitude', 'attachment', 'note', 'event_id']);
 
                 return $attendances->map(
                     function (Attendance $v) {
@@ -47,18 +78,27 @@ class AttendanceHistoryComponent extends Component
                         if ($v->attachment) {
                             $v->setAttribute('attachment', $v->attachment_url);
                         }
+
+                        // Add event details
+                        if ($v->event) {
+                            $v->setAttribute('event_name', $v->event->name);
+                            $v->setAttribute('event_time', $v->event->start_time->format('H:i') . '-' . $v->event->end_time->format('H:i'));
+                            $v->setAttribute('event_location', $v->event->location);
+                        }
+
                         return $v->getAttributes();
                     }
                 )->toArray();
             }
         ) ?? []);
-        $attendanceToday = $attendances->firstWhere(fn ($v, $_) => $v['date'] === Carbon::now()->format('Y-m-d'));
+        $attendanceToday = $attendances->firstWhere(fn($v, $_) => $v['date'] === Carbon::now()->format('Y-m-d'));
         return view('livewire.attendance-history', [
             'attendances' => $attendances,
             'attendanceToday' => $attendanceToday,
             'dates' => $dates,
             'start' => $start,
             'end' => $end,
+            'events' => $events,
         ]);
     }
 }
