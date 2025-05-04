@@ -20,7 +20,7 @@ test('profile information can be updated', function () {
     Livewire::test(UpdateProfileInformationForm::class)
         ->set('state', [
             'name' => 'Test Name',
-            'nip' => '123',
+            'nim' => '123',
             'email' => 'test@example.com',
             'phone' => '123',
             'gender' => 'female',
@@ -38,7 +38,7 @@ test('profile information can be updated', function () {
         ->email->toEqual('test@example.com')
         ->gender->toEqual('female')
         ->phone->toEqual('123')
-        ->nip->toEqual('123')
+        ->nim->toEqual('123')
         ->address->toEqual('abc')
         ->city->toEqual('abc')
         ->birth_date->toEqual(Carbon::parse('2024-01-01'))

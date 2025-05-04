@@ -24,7 +24,7 @@ test('registration screen cannot be rendered if support is disabled', function (
 test('new users can register', function () {
     $response = post('/register', [
         'name' => 'Test User',
-        'nip' => '1234',
+        'nim' => '1234',
         'email' => 'test@example.com',
         'phone' => '123',
         'gender' => 'male',

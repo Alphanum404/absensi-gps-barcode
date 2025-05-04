@@ -17,12 +17,17 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+// // Tambahkan middleware di route register untuk mengalihkan ke halaman login
+// Route::get('/register', function () {
+//     return redirect('/login');
+// });
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/', fn () => Auth::user()->isAdmin ? redirect('/admin') : redirect('/home'));
+    Route::get('/', fn() => Auth::user()->isAdmin ? redirect('/admin') : redirect('/home'));
 
     // USER AREA
     Route::middleware('user')->group(function () {
@@ -39,7 +44,7 @@ Route::middleware([
 
     // ADMIN AREA
     Route::prefix('admin')->middleware('admin')->group(function () {
-        Route::get('/', fn () => redirect('/admin/dashboard'));
+        Route::get('/', fn() => redirect('/admin/dashboard'));
         Route::get('/dashboard', function () {
             return view('admin.dashboard');
         })->name('admin.dashboard');
@@ -60,7 +65,7 @@ Route::middleware([
         Route::get('/barcodes/{id}/download', [BarcodeController::class, 'download'])
             ->name('admin.barcodes.download');
 
-        // User/Employee/Karyawan
+        // User/Employee/Anggota
         Route::resource('/employees', EmployeeController::class)
             ->only(['index'])
             ->names(['index' => 'admin.employees']);
@@ -72,8 +77,8 @@ Route::middleware([
             ->name('admin.masters.job-title');
         Route::get('/masterdata/education', [MasterDataController::class, 'education'])
             ->name('admin.masters.education');
-        Route::get('/masterdata/shift', [MasterDataController::class, 'shift'])
-            ->name('admin.masters.shift');
+        Route::get('/masterdata/event', [MasterDataController::class, 'event'])
+            ->name('admin.masters.event');
         Route::get('/masterdata/admin', [MasterDataController::class, 'admin'])
             ->name('admin.masters.admin');
 
