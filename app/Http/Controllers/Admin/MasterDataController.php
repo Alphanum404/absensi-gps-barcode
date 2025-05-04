@@ -21,9 +21,9 @@ class MasterDataController extends Controller
         return view('admin.master-data.education');
     }
 
-    public function shift()
+    public function event()
     {
-        return view('admin.master-data.shift');
+        return view('admin.master-data.event');
     }
 
     public function admin()
