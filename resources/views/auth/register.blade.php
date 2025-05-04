@@ -16,9 +16,8 @@
       </div>
 
       <div class="mt-4">
-        <x-label for="nip" value="{{ __('NIP') }}" />
-        <x-input id="nip" class="mt-1 block w-full" type="text" name="nip" :value="old('nip')"
-          autocomplete="nip" />
+        <x-label for="nim" value="{{ __('NIM') }}" />
+        <x-input id="nim" class="mt-1 block w-full" type="text" name="nim" :value="old('nim')" autocomplete="nim" />
       </div>
 
       <div class="mt-4">
@@ -71,30 +70,30 @@
 
       @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
         <div class="mt-4">
-          <x-label for="terms">
-            <div class="flex items-center">
-              <x-checkbox name="terms" id="terms" required />
+        <x-label for="terms">
+          <div class="flex items-center">
+          <x-checkbox name="terms" id="terms" required />
 
-              <div class="ms-2">
-                {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                    'terms_of_service' =>
-                        '<a target="_blank" href="' .
-                        route('terms.show') .
-                        '" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">' .
-                        __('Terms of Service') .
-                        '</a>',
-                    'privacy_policy' =>
-                        '<a target="_blank" href="' .
-                        route('policy.show') .
-                        '" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">' .
-                        __('Privacy Policy') .
-                        '</a>',
-                ]) !!}
-              </div>
-            </div>
-          </x-label>
+          <div class="ms-2">
+            {!! __('I agree to the :terms_of_service and :privacy_policy', [
+      'terms_of_service' =>
+        '<a target="_blank" href="' .
+        route('terms.show') .
+        '" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">' .
+        __('Terms of Service') .
+        '</a>',
+      'privacy_policy' =>
+        '<a target="_blank" href="' .
+        route('policy.show') .
+        '" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">' .
+        __('Privacy Policy') .
+        '</a>',
+      ]) !!}
+          </div>
+          </div>
+        </x-label>
         </div>
-      @endif
+    @endif
 
       <div class="mt-4 flex items-center justify-end">
         <a class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
