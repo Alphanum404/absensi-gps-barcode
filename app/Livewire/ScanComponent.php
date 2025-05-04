@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\ExtendedCarbon;
 use App\Models\Attendance;
 use App\Models\Barcode;
-use App\Models\Shift;
+use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Ballen\Distical\Calculator as DistanceCalculator;
@@ -15,18 +15,19 @@ use Illuminate\Support\Carbon;
 class ScanComponent extends Component
 {
     public ?Attendance $attendance = null;
-    public $shift_id = null;
-    public $shifts = null;
+    public $event_id = null;
+    public $events = null;
     public ?array $currentLiveCoords = null;
     public string $successMsg = '';
     public bool $isAbsence = false;
+    public $hasUpcomingEvents = false;
 
     public function scan(string $barcode)
     {
         if (is_null($this->currentLiveCoords)) {
             return __('Invalid location');
-        } else if (is_null($this->shift_id)) {
-            return __('Invalid shift');
+        } else if (is_null($this->event_id)) {
+            return __('Invalid event');
         }
 
         /** @var Barcode */
@@ -79,16 +80,16 @@ class ScanComponent extends Component
         $now = Carbon::now();
         $date = $now->format('Y-m-d');
         $timeIn = $now->format('H:i:s');
-        /** @var Shift */
-        $shift = Shift::find($this->shift_id);
-        $status = Carbon::now()->setTimeFromTimeString($shift->start_time)->lt($now) ? 'late' : 'present';
+        /** @var Event */
+        $event = Event::find($this->event_id);
+        $status = Carbon::now()->setTimeFromTimeString($event->start_time)->lt($now) ? 'late' : 'present';
         return Attendance::create([
             'user_id' => Auth::user()->id,
             'barcode_id' => $barcode->id,
             'date' => $date,
             'time_in' => $timeIn,
             'time_out' => null,
-            'shift_id' => $shift->id,
+            'event_id' => $event->id,
             'latitude' => doubleval($this->currentLiveCoords[0]),
             'longitude' => doubleval($this->currentLiveCoords[1]),
             'status' => $status,
@@ -100,7 +101,7 @@ class ScanComponent extends Component
     protected function setAttendance(Attendance $attendance)
     {
         $this->attendance = $attendance;
-        $this->shift_id = $attendance->shift_id;
+        $this->event_id = $attendance->event_id;
         $this->isAbsence = $attendance->status !== 'present' && $attendance->status !== 'late';
     }
 
@@ -115,28 +116,46 @@ class ScanComponent extends Component
         ];
     }
 
+    // Update the mount method to get events
     public function mount()
     {
-        $this->shifts = Shift::all();
+        // Get events for today or recurring events
+        $this->events = Event::where(function ($query) {
+            $query->whereDate('event_date', now()->toDateString())
+                ->orWhere('is_recurring', true);
+        })->get();
 
-        /** @var Attendance */
+        // Check if user has already attended today
         $attendance = Attendance::where('user_id', Auth::user()->id)
             ->where('date', date('Y-m-d'))->first();
         if ($attendance) {
             $this->setAttendance($attendance);
         } else {
-            // get closest shift from current time
-            $closest = ExtendedCarbon::now()
-                ->closestFromDateArray($this->shifts->pluck('start_time')->toArray());
+            // Set default event if available
+            if ($this->events->isNotEmpty()) {
+                $closest = ExtendedCarbon::now()
+                    ->closestFromDateArray($this->events->pluck('start_time')->toArray());
 
-            $this->shift_id = $this->shifts
-                ->where(fn (Shift $shift) => $shift->start_time == $closest->format('H:i:s'))
-                ->first()->id;
+                $this->event_id = $this->events
+                    ->where(fn(Event $event) => $event->start_time == $closest->format('H:i:s'))
+                    ->first()->id ?? null;
+            }
         }
+
+        // Set nilai $hasUpcomingEvents
+        $today = Carbon::today();
+        $tomorrow = Carbon::tomorrow();
+
+        $this->hasUpcomingEvents = Event::where(function ($query) use ($today, $tomorrow) {
+            $query->whereDate('event_date', $today)
+                ->orWhereDate('event_date', $tomorrow);
+        })->exists();
     }
 
     public function render()
     {
-        return view('livewire.scan');
+        return view('livewire.scan', [
+            'hasUpcomingEvents' => $this->hasUpcomingEvents,
+        ]);
     }
 }

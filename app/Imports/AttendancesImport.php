@@ -3,7 +3,7 @@
 namespace App\Imports;
 
 use App\Models\Attendance;
-use App\Models\Shift;
+use App\Models\Event;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -28,7 +28,7 @@ class AttendancesImport implements ToModel, WithHeadingRow, WithValidation, Skip
         if (isset($row['coordinates'])) {
             [$lat, $lng] = explode(',', $row['coordinates']);
         }
-        $shift_id = Shift::where('name', $row['shift'])->first()?->id ?? $row['shift_id'];
+        $event_id = Event::where('name', $row['event'])->first()?->id ?? $row['event_id'];
 
         $attendance = (new Attendance)->forceFill([
             'user_id' => $row['user_id'],
@@ -36,7 +36,7 @@ class AttendancesImport implements ToModel, WithHeadingRow, WithValidation, Skip
             'date' => $row['date'],
             'time_in' => $row['time_in'],
             'time_out' => $row['time_out'],
-            'shift_id' => $shift_id,
+            'event_id' => $event_id,
             'latitude' => doubleval($lat),
             'longitude' => doubleval($lng),
             'status' => $this->getStatus($row['status']) ?? $row['raw_status'],
@@ -75,7 +75,7 @@ class AttendancesImport implements ToModel, WithHeadingRow, WithValidation, Skip
             'user_id' => 'required|exists:users,id',
             'date' => 'required',
             'status' => 'required',
-            // 'shift' => 'nullable|exists:shifts,name',
+            // 'event' => 'nullable|exists:events,name',
             // 'barcode_id' => 'nullable|exists:barcodes,id',
         ];
     }

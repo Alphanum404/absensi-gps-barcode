@@ -17,7 +17,7 @@ trait AttendanceDetailTrait
             $this->showDetail = true;
             $this->currentAttendance = $attendance->getAttributes();
             $this->currentAttendance['name'] = $attendance->user->name;
-            $this->currentAttendance['nip'] = $attendance->user->nip;
+            $this->currentAttendance['nim'] = $attendance->user->nim;
             $this->currentAttendance['address'] = $attendance->user->address;
             if ($attendance->attachment) {
                 $this->currentAttendance['attachment'] = $attendance->attachment_url;
@@ -25,8 +25,8 @@ trait AttendanceDetailTrait
             if ($attendance->barcode_id) {
                 $this->currentAttendance['barcode'] = $attendance->barcode;
             }
-            if ($attendance->shift_id) {
-                $this->currentAttendance['shift'] = $attendance->shift;
+            if ($attendance->event_id) {
+                $this->currentAttendance['event'] = $attendance->event;
             }
         }
     }

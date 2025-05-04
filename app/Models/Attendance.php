@@ -24,7 +24,7 @@ class Attendance extends Model
         'date',
         'time_in',
         'time_out',
-        'shift_id',
+        'event_id',
         'latitude',
         'longitude',
         'status',
@@ -51,9 +51,9 @@ class Attendance extends Model
         return $this->belongsTo(Barcode::class);
     }
 
-    public function shift()
+    public function event()
     {
-        return $this->belongsTo(Shift::class);
+        return $this->belongsTo(Event::class);
     }
 
     function getLatLngAttribute(): array|null
