@@ -19,15 +19,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
-            'nip' => ['string', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'nim' => ['string', 'max:255', Rule::unique('users')->ignore($user->id)], // Diubah dari nip
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
             'phone' => ['required', 'string', 'max:64', Rule::unique('users')->ignore($user->id)],
             'gender' => ['required', 'string', 'in:male,female'],
-            'address' => ['required', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'birth_date' => ['nullable', 'date'],
-            'birth_place' => ['nullable', 'string', 'max:255'],
             'education_id' => ['nullable', 'exists:educations,id'],
             'division_id' => ['nullable', 'exists:divisions,id'],
             'job_title_id' => ['nullable', 'exists:job_titles,id'],
@@ -49,14 +45,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         } else {
             $user->forceFill([
                 'name' => $input['name'],
-                'nip' => $input['nip'],
+                'nim' => $input['nim'], // Diubah dari nip
                 'email' => $input['email'],
                 'phone' => $input['phone'],
                 'gender' => $input['gender'],
-                'address' => $input['address'],
-                'city' => $input['city'],
-                'birth_date' => $input['birth_date'],
-                'birth_place' => $input['birth_place'],
                 'education_id' => $input['education_id'],
                 'division_id' => $input['division_id'],
                 'job_title_id' => $input['job_title_id'],
@@ -73,15 +65,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     {
         $user->forceFill([
             'name' => $input['name'],
-            'nip' => $input['nip'],
+            'nim' => $input['nim'], // Diubah dari nip
             'email' => $input['email'],
             'email_verified_at' => null,
             'phone' => $input['phone'],
             'gender' => $input['gender'],
-            'address' => $input['address'],
-            'city' => $input['city'],
-            'birth_date' => $input['birth_date'],
-            'birth_place' => $input['birth_place'],
             'education_id' => $input['education_id'],
             'division_id' => $input['division_id'],
             'job_title_id' => $input['job_title_id'],
