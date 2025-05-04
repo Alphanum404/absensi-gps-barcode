@@ -41,7 +41,8 @@
     @if (!$isAbsence)
     <div class="flex flex-col gap-4">
       <div>
-      <x-select id="event" class="mt-1 block w-full" wire:model="event_id" disabled="{{ !is_null($attendance) }}">
+      <x-select id="event" class="mt-1 block w-full" wire:model.live="event_id"
+        disabled="{{ !is_null($attendance) }}">
         <option value="">{{ __('Select Event') }}</option>
         @foreach ($events as $event)
       <option value="{{ $event->id }}" {{ $event->id == $event_id ? 'selected' : '' }}>
@@ -53,12 +54,44 @@
       <x-input-error for="event" class="mt-2" message={{ $message }} />
     @enderror
       </div>
+
+      <!-- Event Information Card -->
+      @if($selectedEvent)
+      <div class="mb-4 p-4 border border-dashed rounded-lg bg-gray-50 dark:bg-gray-700">
+      <h3 class="text-lg font-semibold mb-2">{{ $selectedEvent->name }}</h3>
+      <div class="text-sm space-y-1">
+      <p class="flex items-center">
+      <x-heroicon-o-calendar class="h-4 w-4 mr-2" />
+      <span>{{ Carbon::parse($selectedEvent->event_date)->format('d/m/Y') }}</span>
+      </p>
+      <p class="flex items-center">
+      <x-heroicon-o-clock class="h-4 w-4 mr-2" />
+      <span>{{ Carbon::parse($selectedEvent->start_time)->format('H:i') }} -
+        {{ Carbon::parse($selectedEvent->end_time)->format('H:i') }}</span>
+      </p>
+      @if($selectedEvent->location)
+      <p class="flex items-start">
+      <x-heroicon-o-map-pin class="h-4 w-4 mr-2 mt-1" />
+      <span>{{ $selectedEvent->location }}</span>
+      </p>
+      @endif
+      @if($selectedEvent->description)
+      <p class="flex items-start mt-2">
+      <x-heroicon-o-information-circle class="h-4 w-4 mr-2 mt-1" />
+      <span>{{ $selectedEvent->description }}</span>
+      </p>
+      @endif
+      </div>
+      </div>
+    @endif
+
       <div class="flex justify-center outline outline-gray-100 dark:outline-slate-700" wire:ignore>
       <div id="scanner" class="min-h-72 sm:min-h-96 w-72 rounded-sm outline-dashed outline-slate-500 sm:w-96">
       </div>
       </div>
     </div>
   @endif
+
     <div class="w-full">
       <h4 id="scanner-error" class="mb-3 text-lg font-semibold text-red-500 dark:text-red-400 sm:text-xl" wire:ignore>
       </h4>
@@ -83,6 +116,7 @@
     @endif
         <div class="my-6 h-72 w-full md:h-96" id="currentMap" wire:ignore></div>
       </h4>
+
       <div class="grid grid-cols-2 gap-3 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <div
           class="{{ $attendance?->status == 'late' ? 'bg-red-200 dark:bg-red-900' : 'bg-blue-200 dark:bg-blue-900' }} flex items-center justify-between rounded-md px-4 py-2 text-gray-800 dark:text-white dark:shadow-gray-700">

@@ -21,6 +21,17 @@ class ScanComponent extends Component
     public string $successMsg = '';
     public bool $isAbsence = false;
     public $hasUpcomingEvents = false;
+    public $selectedEvent = null;
+
+    // Add a method to handle event selection
+    public function updatedEventId($value)
+    {
+        if ($value) {
+            $this->selectedEvent = $this->events->firstWhere('id', $value);
+        } else {
+            $this->selectedEvent = null;
+        }
+    }
 
     public function scan(string $barcode)
     {
@@ -116,7 +127,7 @@ class ScanComponent extends Component
         ];
     }
 
-    // Update the mount method to get events
+    // Update the mount method to get events and set the selected event
     public function mount()
     {
         // Get events for today or recurring events
@@ -130,6 +141,9 @@ class ScanComponent extends Component
             ->where('date', date('Y-m-d'))->first();
         if ($attendance) {
             $this->setAttendance($attendance);
+            if ($this->event_id) {
+                $this->selectedEvent = $this->events->firstWhere('id', $this->event_id);
+            }
         } else {
             // Set default event if available
             if ($this->events->isNotEmpty()) {
@@ -139,6 +153,10 @@ class ScanComponent extends Component
                 $this->event_id = $this->events
                     ->where(fn(Event $event) => $event->start_time == $closest->format('H:i:s'))
                     ->first()->id ?? null;
+
+                if ($this->event_id) {
+                    $this->selectedEvent = $this->events->firstWhere('id', $this->event_id);
+                }
             }
         }
 
