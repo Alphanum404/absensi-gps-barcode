@@ -94,7 +94,7 @@
         } else {
         $textClass = 'text-gray-500 dark:text-gray-300';
         }
-        @endphp
+      @endphp
           <th scope="col"
           class="{{ $textClass }} text-nowrap border border-gray-300 px-1 py-3 text-center text-xs font-medium dark:border-gray-600">
           @if ($isPerDayFilter)
@@ -134,7 +134,7 @@
         @foreach ($employees as $employee)
         @php
         $attendances = $employee->attendances;
-      @endphp
+        @endphp
         <tr wire:key="{{ $employee->id }}" class="group">
           {{-- Detail karyawan --}}
           <td class="{{ $class }} text-nowrap group-hover:bg-gray-100 dark:group-hover:bg-gray-700">
@@ -173,13 +173,14 @@
         $excusedCount = 0;
         $sickCount = 0;
         $absentCount = 0;
-        @endphp
+      @endphp
           @foreach ($dates as $date)
           @php
         $isWeekend = $date->isWeekend();
+        $hasEvent = in_array($date->format('Y-m-d'), $events ?? []);  // Check if there's an event for this date
         $attendance = $attendances->firstWhere(fn($v, $k) => $v['date'] === $date->format('Y-m-d'));
         $status = ($attendance ?? [
-        'status' => $isWeekend || !$date->isPast() ? '-' : 'absent',
+        'status' => (!$hasEvent || $isWeekend || !$date->isPast()) ? '-' : 'absent',
         ])['status'];
         switch ($status) {
         case 'present':

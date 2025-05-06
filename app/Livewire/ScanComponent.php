@@ -28,8 +28,25 @@ class ScanComponent extends Component
     {
         if ($value) {
             $this->selectedEvent = $this->events->firstWhere('id', $value);
+
+            // Check if the user already has attendance for this event
+            if ($this->selectedEvent) {
+                $existingAttendance = Attendance::where('user_id', Auth::user()->id)
+                    ->where('event_id', $value)
+                    ->first();
+
+                if ($existingAttendance) {
+                    $this->setAttendance($existingAttendance);
+                } else {
+                    // Reset attendance if changing to an event with no attendance yet
+                    $this->attendance = null;
+                    $this->isAbsence = false;
+                }
+            }
         } else {
             $this->selectedEvent = null;
+            $this->attendance = null;
+            $this->isAbsence = false;
         }
     }
 
@@ -130,11 +147,14 @@ class ScanComponent extends Component
     // Update the mount method to get events and set the selected event
     public function mount()
     {
-        // Get events for today or recurring events
-        $this->events = Event::where(function ($query) {
-            $query->whereDate('event_date', now()->toDateString())
+        // Get events for today, 2 days in the future, and recurring events
+        $today = now()->startOfDay();
+        $twoDaysAhead = now()->addDays(2)->endOfDay();
+
+        $this->events = Event::where(function ($query) use ($today, $twoDaysAhead) {
+            $query->whereBetween('event_date', [$today->toDateString(), $twoDaysAhead->toDateString()])
                 ->orWhere('is_recurring', true);
-        })->get();
+        })->orderBy('event_date')->get();
 
         // Check if user has already attended today
         $attendance = Attendance::where('user_id', Auth::user()->id)

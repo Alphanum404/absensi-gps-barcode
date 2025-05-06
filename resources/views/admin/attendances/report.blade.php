@@ -127,85 +127,87 @@
     </thead>
     <tbody>
       @foreach ($employees as $employee)
-        @php
-        $attendances = $employee->attendances;
-        $attendance = $employee->attendances->isEmpty() ? null : $employee->attendances->first();
+      @php
+      $attendances = $employee->attendances;
+      $attendance = $employee->attendances->isEmpty() ? null : $employee->attendances->first();
+    @endphp
+      <tr style="font-size: 12px">
+      <td style="text-align: center; vertical-align: middle; padding: 0px">
+        {{ $loop->iteration }}
+      </td>
+      <td>
+        {{ $employee->name }}
+      </td>
+      @if ($showUserDetail)
+      <td>
+        {{ $employee->nim }}
+      </td>
+      <td>
+        {{ $employee->division?->name ?? '-' }}
+      </td>
+      <td>
+        {{ $employee->jobTitle?->name ?? '-' }}
+      </td>
+      @if ($isPerDayFilter)
+      <td>
+      {{ $attendance['event'] ?? '-' }}
+      </td>
+      @endif
+    @endif
+      @php
+      $presentCount = 0;
+      $lateCount = 0;
+      $excusedCount = 0;
+      $sickCount = 0;
+      $absentCount = 0;
+    @endphp
+      @foreach ($dates as $date)
+      @php
+      $isWeekend = $date->isWeekend();
+      $hasEvent = in_array($date->format('Y-m-d'), $events ?? []);  // Check if there's an event for this date
+      $attendance = $attendances->firstWhere(fn($v, $k) => $v['date'] === $date->format('Y-m-d'));
+      $status = ($attendance ?? [
+      'status' => (!$hasEvent || $isWeekend || !$date->isPast()) ? '-' : 'absent',
+      ])['status'];
+      switch ($status) {
+      case 'present':
+      $shortStatus = 'H';
+      $presentCount++;
+      break;
+      case 'late':
+      $shortStatus = 'T';
+      $lateCount++;
+      break;
+      case 'excused':
+      $shortStatus = 'I';
+      $excusedCount++;
+      break;
+      case 'sick':
+      $shortStatus = 'S';
+      $sickCount++;
+      break;
+      case 'absent':
+      $shortStatus = 'A';
+      $absentCount++;
+      break;
+      default:
+      $shortStatus = '-';
+      break;
+      }
       @endphp
-        <tr style="font-size: 12px">
-        <td style="text-align: center; vertical-align: middle; padding: 0px">
-          {{ $loop->iteration }}
-        </td>
-        <td>
-          {{ $employee->name }}
-        </td>
-        @if ($showUserDetail)
-        <td>
-          {{ $employee->nim }}
-        </td>
-        <td>
-          {{ $employee->division?->name ?? '-' }}
-        </td>
-        <td>
-          {{ $employee->jobTitle?->name ?? '-' }}
-        </td>
-        @if ($isPerDayFilter)
-        <td>
-        {{ $attendance['event'] ?? '-' }}
-        </td>
-        @endif
-      @endif
-        @php
-        $presentCount = 0;
-        $lateCount = 0;
-        $excusedCount = 0;
-        $sickCount = 0;
-        $absentCount = 0;
-        @endphp
-        @foreach ($dates as $date)
-        @php
-        $isWeekend = $date->isWeekend();
-        $status = ($attendances->firstWhere(fn($v, $k) => $v['date'] === $date->format('Y-m-d')) ?? [
-        'status' => $isWeekend || !$date->isPast() ? '-' : 'absent',
-        ])['status'];
-        switch ($status) {
-        case 'present':
-        $shortStatus = 'H';
-        $presentCount++;
-        break;
-        case 'late':
-        $shortStatus = 'T';
-        $lateCount++;
-        break;
-        case 'excused':
-        $shortStatus = 'I';
-        $excusedCount++;
-        break;
-        case 'sick':
-        $shortStatus = 'S';
-        $sickCount++;
-        break;
-        case 'absent':
-        $shortStatus = 'A';
-        $absentCount++;
-        break;
-        default:
-        $shortStatus = '-';
-        break;
-        }
-        @endphp
-        <td style="padding: 0px; text-align: center;">
-          {{ $isPerDayFilter ? __($status) : $shortStatus }}
-        </td>
-      @endforeach
+      <td style="padding: 0px; text-align: center;">
+        {{ $isPerDayFilter ? __($status) : $shortStatus }}
+      </td>
+    @endforeach
 
-        @if (!$isPerDayFilter)
-        @foreach ([$presentCount, $lateCount, $excusedCount, $sickCount, $absentCount] as $statusCount)
-        <td style=" text-align: center;">
-        {{ $statusCount }}
-        </td>
-        @endforeach
-      @endif
-        </tr>
+      @if (!$isPerDayFilter)
+      @foreach ([$presentCount, $lateCount, $excusedCount, $sickCount, $absentCount] as $statusCount)
+      <td style=" text-align: center;">
+      {{ $statusCount }}
+      </td>
+      @endforeach
+    @endif
+      </tr>
     @endforeach
     </tbody>
   </table>

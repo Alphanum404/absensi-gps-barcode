@@ -74,12 +74,23 @@
         @foreach ($employees as $employee)
         @php
         $attendance = $employee->attendance;
-        $timeIn = $attendance ? $attendance?->time_in?->format('H:i:s') : null;
-        $timeOut = $attendance ? $attendance?->time_out?->format('H:i:s') : null;
+        $isRealAttendance = is_object($attendance) && method_exists($attendance, 'getAttribute');
+        $timeIn = $isRealAttendance && $attendance->time_in ? $attendance->time_in->format('H:i:s') : null;
+        $timeOut = $isRealAttendance && $attendance->time_out ? $attendance->time_out->format('H:i:s') : null;
         $isWeekend = $date->isWeekend();
-        $status = ($attendance ?? [
-        'status' => $isWeekend || !$date->isPast() ? '-' : 'absent',
-        ])['status'];
+        $status = '-';
+
+        if ($attendance) {
+        $status = $attendance->status;
+        } else {
+        // Only mark as absent if there are events today and it's not a weekend
+        if ($hasEvents && !$isWeekend && $date->isPast()) {
+          $status = 'absent';
+        } else {
+          $status = '-';
+        }
+        }
+
         switch ($status) {
         case 'present':
           $shortStatus = 'H';
@@ -126,13 +137,13 @@
           {{ $employee->jobTitle?->name ?? '-' }}
           </td>
           <td class="{{ $class }} text-nowrap group-hover:bg-gray-100 dark:group-hover:bg-gray-700">
-          {{ $attendance->event?->name ?? '-' }}
+          {{ $isRealAttendance && $attendance->event ? $attendance->event->name : '-' }}
           </td>
 
           {{-- Absensi --}}
           <td
           class="{{ $bgColor }} text-nowrap px-1 py-3 text-center text-sm font-medium text-gray-900 dark:text-white">
-          {{ __($status) }}
+          {{ $status == '-' ? '-' : __($status) }}
           </td>
 
           {{-- Waktu masuk/keluar --}}
@@ -147,7 +158,7 @@
           <td
           class="cursor-pointer text-center text-sm font-medium text-gray-900 group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700">
           <div class="flex items-center justify-center gap-3">
-            @if ($attendance && ($attendance->attachment || $attendance->note || $attendance->lat_lng))
+            @if ($isRealAttendance && ($attendance->attachment || $attendance->note || $attendance->lat_lng))
           <x-button type="button" wire:click="show({{ $attendance->id }})"
           onclick="setLocation({{ $attendance->latitude ?? 0 }}, {{ $attendance->longitude ?? 0 }})">
           {{ __('Detail') }}

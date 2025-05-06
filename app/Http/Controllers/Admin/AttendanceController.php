@@ -50,8 +50,8 @@ class AttendanceController extends Controller
             $dates = $start->range($end)->toArray();
         }
         $employees = User::where('group', 'user')
-            ->when($request->division, fn (Builder $q) => $q->where('division_id', $request->division))
-            ->when($request->jobTitle, fn (Builder $q) => $q->where('job_title_id', $request->jobTitle))
+            ->when($request->division, fn(Builder $q) => $q->where('division_id', $request->division))
+            ->when($request->jobTitle, fn(Builder $q) => $q->where('job_title_id', $request->jobTitle))
             ->get()
             ->map(function ($user) use ($request) {
                 if ($request->date) {
@@ -95,7 +95,7 @@ class AttendanceController extends Controller
                                 ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
                                 ->get(['id', 'status', 'date']);
 
-                            return $attendances->map(fn ($v) => $v->getAttributes())->toArray();
+                            return $attendances->map(fn($v) => $v->getAttributes())->toArray();
                         }
                     ) ?? []);
                 } else if ($request->month) {
@@ -110,7 +110,7 @@ class AttendanceController extends Controller
                                 ->whereYear('date', $my->year)
                                 ->get(['id', 'status', 'date']);
 
-                            return $attendances->map(fn ($v) => $v->getAttributes())->toArray();
+                            return $attendances->map(fn($v) => $v->getAttributes())->toArray();
                         }
                     ) ?? []);
                 } else {
@@ -121,9 +121,28 @@ class AttendanceController extends Controller
                 return $user;
             });
 
+        $events = [];
+        if (isset($dates)) {
+            $startDate = $dates[0]->format('Y-m-d');
+            $endDate = end($dates)->format('Y-m-d');
+
+            $events = \App\Models\Event::where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('event_date', [$startDate, $endDate])
+                    ->orWhere('is_recurring', true);
+            })
+                ->get()
+                ->pluck('event_date')
+                ->map(function ($eventDate) {
+                    return $eventDate ? $eventDate->format('Y-m-d') : null;
+                })
+                ->filter()
+                ->toArray();
+        }
+
         $pdf = Pdf::loadView('admin.attendances.report', [
             'employees' => $employees,
             'dates' => $dates,
+            'events' => $events,
             'date' => $request->date,
             'month' => $request->month,
             'week' => $request->week,

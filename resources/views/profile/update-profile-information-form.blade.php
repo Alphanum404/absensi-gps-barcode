@@ -16,7 +16,7 @@
       photoName = $refs.photo.files[0].name;
       const reader = new FileReader();
       reader.onload = (e) => {
-        photoPreview = e.target.result;
+      photoPreview = e.target.result;
       };
       reader.readAsDataURL($refs.photo.files[0]);
       " />
@@ -137,9 +137,9 @@
 
     <!-- Education -->
     <div class="col-span-6 sm:col-span-4">
-      <x-label for="education" value="{{ __('Last Education') }}" />
+      <x-label for="education" value="{{ __('Major') }}" />
       <x-select id="education" class="mt-1 block w-full" wire:model="state.education_id">
-        <option value="">{{ __('Select Education') }}</option>
+        <option value="">{{ __('Select Prodi') }}</option>
         @foreach (App\Models\Education::all() as $education)
       <option value="{{ $education->id }}" {{ $education->id == $state['education_id'] ? 'selected' : '' }}>
         {{ $education->name }}

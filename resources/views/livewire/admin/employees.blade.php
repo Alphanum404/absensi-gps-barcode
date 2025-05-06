@@ -81,7 +81,7 @@
         @foreach ($users as $user)
         @php
         $wireClick = "wire:click=show('$user->id')";
-      @endphp
+        @endphp
         <tr wire:key="{{ $user->id }}" class="group">
           <td class="{{ $class }} p-2 text-center text-sm font-medium text-gray-900 dark:text-white" {{ $wireClick }}>
           {{ $loop->iteration }}
@@ -437,9 +437,9 @@
       @enderror
         </div>
         <div class="mt-4">
-          <x-label for="form.education_id" value="{{ __('Last Education') }}" />
+          <x-label for="form.education_id" value="{{ __('Major') }}" />
           <x-select id="form.education_id" class="mt-1 block w-full" wire:model="form.education_id">
-            <option value="">{{ __('Select Education') }}</option>
+            <option value="">{{ __('Select Prodi') }}</option>
             @foreach (App\Models\Education::all() as $education)
         <option value="{{ $education->id }}" {{ $education->id == $form->education_id ? 'selected' : '' }}>
           {{ $education->name }}
@@ -478,51 +478,51 @@
 
   <x-modal wire:model="showDetail">
     @if ($form->user)
-      @php
-        $division = $form->user->division ? json_decode($form->user->division)->name : '-';
-        $jobTitle = $form->user->jobTitle ? json_decode($form->user->jobTitle)->name : '-';
-        $education = $form->user->education ? json_decode($form->user->education)->name : '-';
-      @endphp
-      <div class="px-6 py-4">
-        <div class="my-4 flex items-center justify-center">
-        <img class="h-32 w-32 rounded-full object-cover" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" />
-        </div>
-
-        <div class="text-center text-lg font-medium text-gray-900 dark:text-gray-100">
-        {{ $form->user->name }}
-        </div>
-
-        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-        <div class="mt-4">
-          <x-label for="nim" value="NIM" />
-          <p>{{ $form->user->nim }}</p>
-        </div>
-        <div class="mt-4">
-          <x-label for="email" value="{{ __('Email') }}" />
-          <p>{{ $form->user->email }}</p>
-        </div>
-        <div class="mt-4">
-          <x-label for="phone" value="{{ __('Phone') }}" />
-          <p>{{ $form->user->phone }}</p>
-        </div>
-        <div class="mt-4">
-          <x-label for="gender" value="{{ __('Gender') }}" />
-          <p>{{ __($form->user->gender) }}</p>
-        </div>
-        <div class="mt-4">
-          <x-label for="job_title_id" value="{{ __('Job Title') }}" />
-          <p>{{ $jobTitle }}</p>
-        </div>
-        <div class="mt-4">
-          <x-label for="division_id" value="{{ __('Division') }}" />
-          <p>{{ $division }}</p>
-        </div>
-        <div class="mt-4">
-          <x-label for="education_id" value="{{ __('Last Education') }}" />
-          <p>{{ $education }}</p>
-        </div>
-        </div>
+    @php
+      $division = $form->user->division ? json_decode($form->user->division)->name : '-';
+      $jobTitle = $form->user->jobTitle ? json_decode($form->user->jobTitle)->name : '-';
+      $education = $form->user->education ? json_decode($form->user->education)->name : '-';
+    @endphp
+    <div class="px-6 py-4">
+      <div class="my-4 flex items-center justify-center">
+      <img class="h-32 w-32 rounded-full object-cover" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" />
       </div>
+
+      <div class="text-center text-lg font-medium text-gray-900 dark:text-gray-100">
+      {{ $form->user->name }}
+      </div>
+
+      <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+      <div class="mt-4">
+        <x-label for="nim" value="NIM" />
+        <p>{{ $form->user->nim }}</p>
+      </div>
+      <div class="mt-4">
+        <x-label for="email" value="{{ __('Email') }}" />
+        <p>{{ $form->user->email }}</p>
+      </div>
+      <div class="mt-4">
+        <x-label for="phone" value="{{ __('Phone') }}" />
+        <p>{{ $form->user->phone }}</p>
+      </div>
+      <div class="mt-4">
+        <x-label for="gender" value="{{ __('Gender') }}" />
+        <p>{{ __($form->user->gender) }}</p>
+      </div>
+      <div class="mt-4">
+        <x-label for="job_title_id" value="{{ __('Job Title') }}" />
+        <p>{{ $jobTitle }}</p>
+      </div>
+      <div class="mt-4">
+        <x-label for="division_id" value="{{ __('Division') }}" />
+        <p>{{ $division }}</p>
+      </div>
+      <div class="mt-4">
+        <x-label for="education_id" value="{{ __('Major') }}" />
+        <p>{{ $education }}</p>
+      </div>
+      </div>
+    </div>
   @endif
   </x-modal>
 </div>

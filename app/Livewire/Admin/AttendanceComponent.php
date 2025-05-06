@@ -66,6 +66,26 @@ class AttendanceComponent extends Component
             $end = Carbon::parse($this->month)->endOfMonth();
             $dates = $start->range($end)->toArray();
         }
+
+        // Get events for the selected date range
+        $events = [];
+        if (isset($dates)) {
+            $startDate = $dates[0]->format('Y-m-d');
+            $endDate = end($dates)->format('Y-m-d');
+
+            $events = \App\Models\Event::where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('event_date', [$startDate, $endDate])
+                    ->orWhere('is_recurring', true);
+            })
+                ->get()
+                ->pluck('event_date')
+                ->map(function ($eventDate) {
+                    return $eventDate ? $eventDate->format('Y-m-d') : null;
+                })
+                ->filter()
+                ->toArray();
+        }
+
         $employees = User::where('group', 'user')
             ->when($this->search, function (Builder $q) {
                 return $q->where('name', 'like', '%' . $this->search . '%')
@@ -158,6 +178,10 @@ class AttendanceComponent extends Component
                 $user->attendances = $attendances;
                 return $user;
             });
-        return view('livewire.admin.attendance', ['employees' => $employees, 'dates' => $dates]);
+        return view('livewire.admin.attendance', [
+            'employees' => $employees,
+            'dates' => $dates,
+            'events' => $events
+        ]);
     }
 }

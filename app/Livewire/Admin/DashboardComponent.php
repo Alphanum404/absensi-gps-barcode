@@ -24,13 +24,20 @@ class DashboardComponent extends Component
         /** @var Collection<User>  */
         $employees = User::where('group', 'user')
             ->paginate(20)
-            ->through(function (User $user) use ($attendances) {
-                return $user->setAttribute(
-                    'attendance',
-                    $attendances
-                        ->where(fn(Attendance $attendance) => $attendance->user_id === $user->id)
-                        ->first(),
-                );
+            ->through(function (User $user) use ($attendances, $hasEvents) {
+                $attendance = $attendances
+                    ->where(fn(Attendance $attendance) => $attendance->user_id === $user->id)
+                    ->first();
+
+                // If no attendance but there are events today, mark as absent
+                // Otherwise, don't mark anything (null)
+                if (!$attendance && $hasEvents) {
+                    $attendance = (object) [
+                        'status' => 'absent'
+                    ];
+                }
+
+                return $user->setAttribute('attendance', $attendance);
             });
 
         $employeesCount = User::where('group', 'user')->count();
@@ -50,6 +57,7 @@ class DashboardComponent extends Component
             'excusedCount' => $excusedCount,
             'sickCount' => $sickCount,
             'absentCount' => $absentCount,
+            'hasEvents' => $hasEvents,
         ]);
     }
 }
